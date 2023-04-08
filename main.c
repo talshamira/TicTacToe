@@ -13,6 +13,7 @@
 #define ERROR_CODE3 3
 #define PLAYER1 1
 #define PLAYER2 2
+#define PRINT 10
 
 typedef enum Winner {FIRSTPLAYER, SECONDPLAYER, TIE, NOWINNER} Winner;
 typedef enum Character {X, O} Character; 
@@ -24,23 +25,23 @@ typedef struct {
 typedef struct {
     Player player1;
     Player player2;
-    char board[M][M];
+    Character board[M][M];
     int turn;
     Winner winner;
 } Game;
 int getParamaters(Game *game);
 void printBoard(const Game *game);
 int getChar(char *choice);
-bool checkDown(const Game *game, const char choice, const char playerCharacter);
-bool checkLeft(const Game *game, const char choice, const char playerCharacter);
+bool checkDown(const Game *game, const char choice, const Character playerCharacter);
+bool checkLeft(const Game *game, const char choice, const Character playerCharacter);
 void whoIsWinner(Game *game);
-bool checkPrimaryDiaganal(const Game *game, const char playerCahracter);
-bool checkSecondaryDiaganal(const Game *game, const char playerCahracter);
+bool checkPrimaryDiaganal(const Game *game, const Character playerCahracter);
+bool checkSecondaryDiaganal(const Game *game, const Character playerCahracter);
 bool isFull(const Game *game);
-void getWinner(Game *game ,const char choice);
+void getWinner(Game *game ,const int choice);
 int turn(Game *game);
 bool isValidChoice(const Game *game, const int choice);
-void enterChoice(Game *game, const int choice, const char playerCharacter);
+void enterChoice(Game *game, const int choice, const Character playerCharacter);
 
 int main()
 {
@@ -62,10 +63,10 @@ int main()
             printf("It is a tie! \n");
             break;
         case FIRSTPLAYER:
-            printf("%s is the winner!", game.player1.name);
+            printf("%s is the winner!\n", game.player1.name);
             break;
         case SECONDPLAYER:
-            printf("%s is the winner!", game.player2.name);
+            printf("%s is the winner!\n", game.player2.name);
             break;
         default:
             break;
@@ -84,7 +85,7 @@ int main()
             }
         }
     }while(choice != 'n');
-    
+    printf("Thanks for playing!!!");
     free(game.player1.name);
     free(game.player2.name);
     return 0;
@@ -99,7 +100,7 @@ int getChar(char *choice)
     return ALL_OK;
 }
 
-bool checkDown(const Game *game, const char choice, const char playerCharacter)
+bool checkDown(const Game *game, const char choice, const Character playerCharacter)
 {
     int counter = 0;
     for(int i = 0; i < M; i++)
@@ -116,7 +117,7 @@ bool checkDown(const Game *game, const char choice, const char playerCharacter)
     return false;
 }
 
-bool checkLeft(const Game *game, const char choice, const char playerCharacter)
+bool checkLeft(const Game *game, const char choice, const Character playerCharacter)
 {
     int counter = 0;
     for(int i = M-1; i >=0 ; i--)
@@ -143,7 +144,7 @@ void whoIsWinner(Game *game)
         game->winner = SECONDPLAYER;
     }
 }
-bool checkPrimaryDiaganal(const Game *game, const char playerCahracter)
+bool checkPrimaryDiaganal(const Game *game, const Character playerCahracter)
 {
     int counter = 0;
     for(int i = 0; i < M ; i++)
@@ -159,7 +160,7 @@ bool checkPrimaryDiaganal(const Game *game, const char playerCahracter)
     }
     return false;
 }
-bool checkSecondaryDiaganal(const Game *game, const char playerCahracter)
+bool checkSecondaryDiaganal(const Game *game, const Character playerCahracter)
 {
     int counter = 0;
     for(int i = 0, j = M-1; i < M ; i++, j--)
@@ -177,21 +178,22 @@ bool checkSecondaryDiaganal(const Game *game, const char playerCahracter)
 }
 bool isFull(const Game *game)
 {
+    int counter = 0;
     for(int i = 0; i < M; i++)
     {
         for(int j = 0; j < M; j++)
         {
-            if(game->board[i][j] == ' ')
+            if(game->board[i][j] == X || game->board[i][j] == O)
             {
-                return false;
+                counter++;
             }
         }
     }
-    return true;
+    return (counter == M*M);
 }
-void getWinner(Game *game ,const char choice)
+void getWinner(Game *game ,const int choice)
 {
-    char playerCharacter;
+    Character playerCharacter;
     if(game->turn == PLAYER1)
     {
         playerCharacter = game->player1.character;
@@ -204,11 +206,11 @@ void getWinner(Game *game ,const char choice)
     {
         game->winner=TIE;
     }
-    if((!((int) (choice%M))) || ((int) (choice%M) == 1))
+    if((!(choice%M)) || ((choice%M) == 1))
     {
-        if(choice/M == 1)
+        if(choice%M == 1)
         {
-            if((int)(choice%M) == 1)
+            if(!choice/M)
             {
                 if(checkPrimaryDiaganal(game, playerCharacter))
                 {
@@ -227,16 +229,9 @@ void getWinner(Game *game ,const char choice)
                 whoIsWinner(game);
             }
         }
-        else if((int) (choice/M) == 2)
-        {
-            if(checkLeft(game,choice, playerCharacter))
-            {
-                whoIsWinner(game);
-            }
-        }
         else
         {
-            if(!((int)(choice%M)))
+            if(!(choice%M))
             {
                 if(checkPrimaryDiaganal(game, playerCharacter))
                 {
@@ -269,7 +264,7 @@ void getWinner(Game *game ,const char choice)
 int turn(Game *game)
 {
     int choice;
-    char playerCharacter;
+    Character playerCharacter;
     bool flag = true;
     if(game->turn == PLAYER1)
     {
@@ -288,7 +283,7 @@ int turn(Game *game)
         }
     while(flag)
     {
-        if(choice == 10)
+        if(choice == PRINT)
         {
             printBoard(game);
             printf("Please enter your choice \n");
@@ -314,6 +309,7 @@ int turn(Game *game)
             }
         }
     }
+    getWinner(game, choice);
     if(game->turn == PLAYER1)
     {
         game->turn = PLAYER2;
@@ -329,20 +325,20 @@ bool isValidChoice(const Game *game, const int choice)
 {
     if(!(choice%M))
     {
-        return ( (game->board[(choice-1)/M][choice%M] == ' ') &&  ((choice <= 9) && (choice > 0)) );
+        return ( ((game->board[(choice/M) -1][M-1] != X) && (game->board[(choice/M) -1][M-1] != O)) &&  ((choice <= 9) && (choice > 0)) );
     }
-    return ( (game->board[choice/M][choice%M] == ' ') &&  ((choice <= 9) && (choice > 0)) );
+    return ( ((game->board[choice/M][(choice%M)-1] != X) && (game->board[choice/M][(choice%M)-1] != O)) &&  ((choice <= 9) && (choice > 0)) );
 }
-void enterChoice(Game *game, const int choice, const char playerCharacter)
+void enterChoice(Game *game, const int choice, const Character playerCharacter)
 {
     
     if(!(choice%M))
     {
-        game->board[(choice-1)/M][choice%M] = playerCharacter;
+        game->board[(choice/M)-1][M-1] = playerCharacter;
     }
     else
     {
-        game->board[choice/M][choice%M] = playerCharacter; 
+        game->board[choice/M][(choice%M) -1] = playerCharacter; 
     }
 }
 
@@ -370,10 +366,17 @@ int getParamaters(Game *game)
     }
     strcpy(game->player1.name , buffer);
     printf("Please enter your prefered character %s.\nChoose X or O\n", game->player1.name);
-    if(getChar(&choice))
-    {
-        return ERROR_CODE2;
-    }
+   do
+   {
+        if(getChar(&choice))
+        {
+            return ERROR_CODE2;
+        }
+        if(choice != 'X' && choice != 'O')
+        {
+            printf("Invalid Choice!\nPlease enter a valid option\n");
+        }
+   } while(choice != 'X' && choice != 'O');
     printf("Player2 please enter your name: \n");
     if(!scanf(" %s", buffer))
     {
@@ -421,7 +424,18 @@ void printBoard(const Game *game)
     {
         for (int j = 0; j < M; j++)
         {
-            printf("%c", game->board[i][j]);
+            if(game->board[i][j] == X)
+            {
+                printf("X");
+            }
+            else if(game->board[i][j] == O)
+            {
+                printf("O");
+            }
+            else
+            {
+                printf(" ");
+            }
             if(j != 2)
             {
                 printf(" | ");
