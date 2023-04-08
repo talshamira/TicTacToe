@@ -17,6 +17,6 @@ set(CMAKE_C_FLAGS ${MTM_FLAGS_DEBUG})
 
 
 # Add the names of your source files here
-set(C_FILES "<main.c>")
+set(C_FILES "main.c" "TicTacToe.c")
 
 add_executable(TicTacToe ${C_FILES})
