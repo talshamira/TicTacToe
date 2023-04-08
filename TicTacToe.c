@@ -1,13 +1,13 @@
 #include "TicTacToe.h"
 
-int getChar(char *choice)
+ERROR getChar(char *choice)
 {
     if(!scanf(" %c",choice))
     {
         printf(ERROR2);
-        return ERROR_CODE2;
+        return DATA_FAIL;
     }
-    return ALL_OK;
+    return SUCCESS;
 }
 
 bool checkDown(const Game *game, const char choice, const Character playerCharacter)
@@ -171,7 +171,7 @@ void getWinner(Game *game ,const int choice)
 }
 
 
-int turn(Game *game)
+ERROR turn(Game *game)
 {
     int choice;
     Character playerCharacter;
@@ -189,7 +189,7 @@ int turn(Game *game)
     if(!scanf("%d", &choice))
         {
             printf(ERROR2);
-            return ERROR_CODE2;
+            return DATA_FAIL;
         }
     while(flag)
     {
@@ -200,7 +200,7 @@ int turn(Game *game)
             if(!scanf("%d", &choice))
             {
                 printf(ERROR2);
-                return ERROR_CODE2;
+                return DATA_FAIL;
             }
             
         }
@@ -215,7 +215,7 @@ int turn(Game *game)
             if(!scanf("%d", &choice))
             {
                 printf(ERROR2);
-                return ERROR_CODE2;
+                return DATA_FAIL;
             }
         }
     }
@@ -229,7 +229,7 @@ int turn(Game *game)
         game->turn = PLAYER1;
     }
     printBoard(game);
-    return ALL_OK;
+    return SUCCESS;
 }
 bool isValidChoice(const Game *game, const int choice)
 {
@@ -252,7 +252,7 @@ void enterChoice(Game *game, const int choice, const Character playerCharacter)
     }
 }
 
-int getParamaters(Game *game)
+ERROR getParamaters(Game *game)
 {
     char choice;
     char buffer[BUFFER_Size]="";
@@ -260,27 +260,27 @@ int getParamaters(Game *game)
     if(!scanf(" %s", buffer))
     {
         printf(ERROR1);
-        return ERROR_CODE1;
+        return DATA_FAIL;
     }
     if(!strlen(buffer))
     {
         printf(ERROR3);
-        return ERROR_CODE3;
+        return EMPTY_STRING;
     }
     game->player1.name = (char*) malloc(strlen(buffer) + 1);
     if(!game->player1.name)
     {
         printf(ERROR3);
         free(game->player1.name);
-        return ERROR_CODE3;
+        return EMPTY_STRING;
     }
     strcpy(game->player1.name , buffer);
     printf("Please enter your prefered character %s.\nChoose X or O\n", game->player1.name);
    do
    {
-        if(getChar(&choice))
+        if(getChar(&choice) != SUCCESS)
         {
-            return ERROR_CODE2;
+            return DATA_FAIL;
         }
         if(choice != 'X' && choice != 'O')
         {
@@ -291,12 +291,12 @@ int getParamaters(Game *game)
     if(!scanf(" %s", buffer))
     {
         printf(ERROR1);
-        return ERROR_CODE1;
+        return DATA_FAIL;
     }
     if(!strlen(buffer))
     {
         printf(ERROR3);
-        return ERROR_CODE3;
+        return EMPTY_STRING;
     }
     game->player2.name = (char*) malloc(strlen(buffer) + 1);
     if(!game->player2.name)
@@ -304,7 +304,7 @@ int getParamaters(Game *game)
         printf(ERROR3);
         free(game->player1.name);
         free(game->player2.name);
-        return ERROR_CODE3;
+        return EMPTY_STRING;
     }
     strcpy(game->player2.name , buffer);
     switch (choice)
@@ -325,7 +325,7 @@ int getParamaters(Game *game)
         {
             game->board[i][j]= ' ';
         }
-    return ALL_OK;
+    return SUCCESS;
 }
 
 void printBoard(const Game *game)

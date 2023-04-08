@@ -6,13 +6,16 @@ int main()
     Game game;
     do
     {
-        if(getParamaters(&game))
+        if(getParamaters(&game) != SUCCESS)
         {
             return -1;
         }
         while(game.winner == NOWINNER)
         {
-            turn(&game);
+            if(turn(&game) != SUCCESS)
+            {
+                return -1;
+            }
         }
         switch (game.winner)
         {
@@ -29,7 +32,7 @@ int main()
             break;
         }
         printf("Would you like to play again?\nPress y for yes and n for no\n");
-        if(getChar(&choice))
+        if(getChar(&choice) != SUCCESS)
         {
             return -1;
         }
